@@ -33,9 +33,12 @@ conn = mysql.connector.connect(
 
 connx = conn.cursor() 
 
-df_txtan_assessor = connx.query('SELECT * FROM txtan_assessor;', ttl=600)
+connx.execute('SELECT * FROM txtan_assessor;', ttl=600)
+df_txtan_assessor = connx.fetchall()
+column_name_txtan_assessor = [i[0] for i in connx.description]
+df_txtan_assessor = pd.DataFrame(df_txtan_assessor, columns=columns_name_txtan_assessor)
 
-df_pito_product = connx.query("""
+connx.execute("""
 SELECT
     pdc.id_product,                          
 	pdc.name_product AS 'PRODUCT',
@@ -43,16 +46,22 @@ SELECT
 	comp.description AS 'COMPETENCY DESCRIPTION'
 FROM `pito_product` AS pdc
 JOIN pito_competency AS comp ON comp.id_product = pdc.id_product
-""", ttl=600)
+""")
+df_pito_product = connx.fetchall()
+column_names_pito_product = [i[0] for i in connx.description]
+df_pito_product = pd.DataFrame(df_pito_product, columns=column_names_pito_product)
 options_product_set = df_pito_product['PRODUCT'].drop_duplicates().tolist() #list produk dari database
 
-df_pito_level = connx.query("""
+connx.execute("""
 SELECT
     lvl.name_level AS 'NAMA LEVEL',
     lvl.value_level,
     lvl.id_level_set
 FROM pito_level AS lvl;
-""", ttl=600)
+""")
+df_pito_level = connx.fetchall()
+column_names_pito_level = [i[0] for i in connx.description]
+df_pito_level = pd.DataFrame(df_pito_level, columns=column_names_pito_level)
 options_level_set = df_pito_level['id_level_set'].drop_duplicates().tolist() #list level dari database
 
 st.header("Aplikasi Prediksi Kompetensi")
