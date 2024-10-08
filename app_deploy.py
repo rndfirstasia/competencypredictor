@@ -12,18 +12,18 @@ st.set_page_config(
 
 #env
 #taruh semua credential ke st.connection
-conn = st.connection('mysql', type='sql')
+# conn = st.connection('mysql', type='sql')
 
 aws_access_key_id = st.secrets["aws"]["aws_access_key_id"]
 aws_secret_access_key = st.secrets["aws"]["aws_secret_access_key"]
 endpoint_url = st.secrets["aws"]["endpoint_url"]
-mysql_user = st.secrets["connections"]["mysql"]["username"]
-mysql_password = st.secrets["connections"]["mysql"]["password"]
-mysql_host = st.secrets["connections"]["mysql"]["host"]
-mysql_port = st.secrets["connections"]["mysql"]["port"]
-mysql_database = st.secrets["connections"]["mysql"]["database"]
+mysql_user = st.secrets["mysql"]["username"]
+mysql_password = st.secrets["mysql"]["password"]
+mysql_host = st.secrets["mysql"]["host"]
+mysql_port = st.secrets["mysql"]["port"]
+mysql_database = st.secrets["mysql"]["database"]]
 
-conn_config = mysql.connector.connect(
+conn = mysql.connector.connect(
     user=mysql_user,
     password=mysql_password,
     host=mysql_host,
@@ -137,7 +137,7 @@ with tab1:
 
             #Simpan informasi ke table txtan_audio
             try:
-                cursor_config = conn_config.cursor()
+                cursor_config = conn.cursor()
                 selected_id_product = selected_product['id_product'].iloc[0]
                 insert_query = """
                 INSERT INTO txtan_audio (registration_id, date, num_speakers, id_product, id_level_set, kode_assessor, audio_file_name)
@@ -153,7 +153,7 @@ with tab1:
                     file_name
                 )
                 cursor_config.execute(insert_query, data)
-                conn_config.commit()
+                conn.commit()
                 st.success("Informasi berhasil tersimpan")
             except Exception as e:
                 st.error(f"Error: {e}")
@@ -179,7 +179,7 @@ with tab2:
             FROM txtan_separator
             WHERE registration_id = %s
             """
-            cursor = conn_config.cursor()
+            cursor = conn.cursor()
             cursor.execute(query, (registration_id,))
             result = cursor.fetchall()
 
@@ -214,7 +214,7 @@ with tab3:
             FROM txtan_competency_result
             WHERE registration_id = %s
             """
-            cursor = conn_config.cursor()
+            cursor = conn.cursor()
             cursor.execute(query, (registration_id,))
             result = cursor.fetchall()
 
@@ -231,9 +231,9 @@ with tab3:
             INSERT INTO txtan_competency_result_so (registration_id, competency, level, reason, so_level, so_reason)
             VALUES (%s, %s, %s, %s, %s, %s)
             """
-            cursor = conn_config.cursor()
+            cursor = conn.cursor()
             cursor.executemany(query, data_to_save)
-            conn_config.commit()
+            conn.commit()
             cursor.close()
         
         if id_input_id_kandidat:
