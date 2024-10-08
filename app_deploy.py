@@ -12,7 +12,7 @@ st.set_page_config(
 
 #env
 #taruh semua credential ke st.connection
-conn = st.connection('mysql', type='sql')
+#conn = st.connection('mysql', type='sql')
 
 aws_access_key_id = st.secrets["aws"]["aws_access_key_id"]
 aws_secret_access_key = st.secrets["aws"]["aws_secret_access_key"]
