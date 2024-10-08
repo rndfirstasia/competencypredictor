@@ -17,7 +17,7 @@ conn = st.connection('mysql', type='sql')
 aws_access_key_id = st.secrets["aws"]["aws_access_key_id"]
 aws_secret_access_key = st.secrets["aws"]["aws_secret_access_key"]
 endpoint_url = st.secrets["aws"]["endpoint_url"]
-mysql_user = st.secrets["mysql"]["user"]
+mysql_user = st.secrets["mysql"]["username"]
 mysql_password = st.secrets["mysql"]["password"]
 mysql_host = st.secrets["mysql"]["host"]
 mysql_port = st.secrets["mysql"]["port"]
