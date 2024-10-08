@@ -31,8 +31,6 @@ conn_config = mysql.connector.connect(
     database=mysql_database
 )
 
-conn = conn_config
-
 df_txtan_assessor = conn.query('SELECT * FROM txtan_assessor;', ttl=600)
 
 df_pito_product = conn.query("""
