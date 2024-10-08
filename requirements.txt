@@ -7,3 +7,4 @@ mysqlclient
 streamlit
 pkg-config
 libmysqlclient-dev
+pipreqs
