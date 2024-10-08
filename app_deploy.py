@@ -33,7 +33,7 @@ conn = mysql.connector.connect(
 
 connx = conn.cursor() 
 
-connx.execute('SELECT * FROM txtan_assessor;', ttl=600)
+connx.execute('SELECT * FROM txtan_assessor;')
 df_txtan_assessor = connx.fetchall()
 column_name_txtan_assessor = [i[0] for i in connx.description]
 df_txtan_assessor = pd.DataFrame(df_txtan_assessor, columns=columns_name_txtan_assessor)
