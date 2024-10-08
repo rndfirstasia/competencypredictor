@@ -12,6 +12,7 @@ st.set_page_config(
 
 #env
 #taruh semua credential ke st.connection
+st.set_option('deprecation.showPyplotGlobalUse', False)
 conn = st.connection('mysql', type='sql')
 
 aws_access_key_id = st.secrets["aws"]["aws_access_key_id"]
