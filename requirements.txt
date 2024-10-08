@@ -3,8 +3,4 @@ datetime
 boto3
 mysql-connector-python
 sqlalchemy
-mysqlclient
 streamlit
-pkg-config
-libmysqlclient-dev
-pipreqs
