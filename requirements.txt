@@ -4,4 +4,3 @@ boto3
 mysql-connector-python
 sqlalchemy
 streamlit
-mysqlclient
