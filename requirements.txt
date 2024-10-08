@@ -5,3 +5,5 @@ mysql-connector-python
 sqlalchemy
 mysqlclient
 streamlit
+pkg-config
+libmysqlclient-dev
