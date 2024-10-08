@@ -31,9 +31,11 @@ conn = mysql.connector.connect(
     database=mysql_database
 )
 
-df_txtan_assessor = conn.query('SELECT * FROM txtan_assessor;', ttl=600)
+connx = conn.cursor() 
 
-df_pito_product = conn.query("""
+df_txtan_assessor = connx.query('SELECT * FROM txtan_assessor;', ttl=600)
+
+df_pito_product = connx.query("""
 SELECT
     pdc.id_product,                          
 	pdc.name_product AS 'PRODUCT',
@@ -44,7 +46,7 @@ JOIN pito_competency AS comp ON comp.id_product = pdc.id_product
 """, ttl=600)
 options_product_set = df_pito_product['PRODUCT'].drop_duplicates().tolist() #list produk dari database
 
-df_pito_level = conn.query("""
+df_pito_level = connx.query("""
 SELECT
     lvl.name_level AS 'NAMA LEVEL',
     lvl.value_level,
