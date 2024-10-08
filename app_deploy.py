@@ -17,11 +17,11 @@ conn = st.connection('mysql', type='sql')
 aws_access_key_id = st.secrets["aws"]["aws_access_key_id"]
 aws_secret_access_key = st.secrets["aws"]["aws_secret_access_key"]
 endpoint_url = st.secrets["aws"]["endpoint_url"]
-mysql_user = connections["mysql"]["username"]
-mysql_password = connections["mysql"]["password"]
-mysql_host = connections["mysql"]["host"]
-mysql_port = connections["mysql"]["port"]
-mysql_database = connections["mysql"]["database"]
+mysql_user = st.secrets["connections"]["mysql"]["username"]
+mysql_password = st.secrets["connections"]["mysql"]["password"]
+mysql_host = st.secrets["connections"]["mysql"]["host"]
+mysql_port = st.secrets["connections"]["mysql"]["port"]
+mysql_database = st.secrets["connections"]["mysql"]["database"]
 
 conn_config = mysql.connector.connect(
     user=mysql_user,
