@@ -3,3 +3,4 @@ datetime
 boto3
 mysql-connector-python
 sqlalchemy
+mysqlclient
