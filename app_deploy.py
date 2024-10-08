@@ -21,7 +21,7 @@ mysql_user = st.secrets["mysql"]["username"]
 mysql_password = st.secrets["mysql"]["password"]
 mysql_host = st.secrets["mysql"]["host"]
 mysql_port = st.secrets["mysql"]["port"]
-mysql_database = st.secrets["mysql"]["database"]]
+mysql_database = st.secrets["mysql"]["database"]
 
 conn = mysql.connector.connect(
     user=mysql_user,
