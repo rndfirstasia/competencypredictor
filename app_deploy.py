@@ -41,7 +41,7 @@ else:
 	st.warning("Belum menerima url dari colab")
 
 data_input = st.text_input("Masukkan data:")
-if st.button("Simpan", key="simpan_1")
+if st.button("Simpan", key="simpan_1"):
 	if data_input and ngrok_url:
 		response = requests.post(f"{ngrok_url}/task", json={'data': data_input})
 		if response.status_code ==200:
