@@ -23,7 +23,7 @@ def receivve_ngrok_url():
 	data = request.json
 	ngrok_url = data.get('ngrok_url')
 	if ngrok_url:
-		return jsonify({'status': 'Ngrok url diterima', 'ngrok_url': ngrok_url)
+		return jsonify({'status': 'Ngrok url diterima', 'ngrok_url': ngrok_url})
 	else:
 		return jsonify({'status': 'Ngrok url tidak valid'}), 400
 def run_flask():
