@@ -10,6 +10,48 @@ st.set_page_config(
     page_title="Prediksi Kompetensi",
 )
 
+import requests
+from flask import Flask, request, jsonify
+
+ngrok_url = None
+
+app = Flask(__name__)
+
+@app.route('/receive_ngrok_url', methods=['POST'])
+def receivve_ngrok_url():
+	global ngrok_url
+	data = request.json
+	ngrok_url = data.get('ngrok_url')
+	if ngrok_url:
+		return jsonify({'status': 'Ngrok url diterima', 'ngrok_url': ngrok_url)
+	else:
+		return jsonify({'status': 'Ngrok url tidak valid'}), 400
+def run_flask():
+	app.run()
+
+import threading
+flask_thread = threading.Thread(target=run_flask)
+flask_thread.start()
+
+st.title('Test streamlit dengan colab')
+
+if ngrok_url:
+	st.success(f'Ngrok url diterima: {ngrok_url}')
+else:
+	st.warning("Belum menerima url dari colab")
+
+data_input = st.text_input("Masukkan data:")
+if st.button("Simpan", key="simpan_1")
+	if data_input and ngrok_url:
+		response = requests.post(f"{ngrok_url}/task", json={'data': data_input})
+		if response.status_code ==200:
+			st.success("Data berhasil disimpan di flask")
+		else:
+			st.error("gagal mengirim data ke flask")
+	else:
+		st.warning("ngrok kosong")
+	
+
 #env
 #taruh semua credential ke st.connection
 # conn = st.connection('mysql', type='sql')
