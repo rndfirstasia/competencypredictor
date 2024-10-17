@@ -5,3 +5,8 @@ mysql-connector-python
 sqlalchemy
 streamlit
 Flask
+
+openai
+requests
+io
+collections
