@@ -720,8 +720,8 @@ with tab3:
         st.markdown('Jenis Kelamin: Pria')
         st.markdown('Produk: PITO Staff')
     
-    with st.container(border=True):
-        st.write("Pilihan tidak ada bisa dipilih jika dirasa memang tidak muncul di Assessor")
+    #with st.container(border=True):
+        #st.write("Pilihan tidak ada bisa dipilih jika dirasa memang tidak muncul di Assessor")
 
     with st.container():
 
