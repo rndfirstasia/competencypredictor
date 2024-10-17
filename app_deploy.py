@@ -324,7 +324,7 @@ with tab1:
 
         # Debugging untuk memeriksa hasil akhir
         df = pd.DataFrame(data)
-        st.success("Step 3/5: Pembicara berhasil ditambahkan.", df) #debug
+        st.success("Step 3/5: Pembicara berhasil ditambahkan.") #debug
 
         if df.empty:
             st.error("DataFrame is empty after processing GPT response.")
