@@ -365,7 +365,6 @@ with tab1:
             
             #st.write(f"Processed DataFrame for {registration_id}:", df)  # Debug
 
-            # Merger text dan speaker
             merged_text = []
             merged_speakers = []
             previous_speaker = None
@@ -615,9 +614,8 @@ with tab1:
                 
                 if response.status_code == 200:
                     st.success("Step 2/5: Audio berhasil ditranskripsi.") #debug
-                    segments = response.json()  # Assuming this is a list of segments
+                    segments = response.json() 
 
-                    # Insert each segment into the database
                     if segments:
                         for segment in segments:
                             registration_id = segment['registration_id']
@@ -635,7 +633,7 @@ with tab1:
 
                                 data_transcript = (
                                     registration_id,
-                                    id_audio,  # Use the retrieved id_audio
+                                    id_audio,  
                                     start_section,
                                     end_section,
                                     text,
