@@ -106,8 +106,6 @@ id_input_id_kandidat = st.sidebar.text_input("ID Kandidat")
 selected_option_num_speaker = st.sidebar.selectbox("Jumlah Speaker", options_num_speaker)
 selected_option_product_set = st.sidebar.selectbox("Set Kompetensi", options_product_set)
 selected_option_level_set = st.sidebar.selectbox("Set Level", options_level_set)
-        
-tab1, tab2, tab3, tab4 = st.tabs(["📈 Input Informasi", "📄 Hasil Transkrip", "🖨️ Hasil Prediksi", "⚙️ <admin> Input"])
 
 #connect API kandidat dengan PITO
 response_id_kandidat = requests.get(api_url.format(id_kandidat=id_input_id_kandidat))
@@ -120,15 +118,9 @@ if response_id_kandidat.status_code == 200:
     api_produk = api_data.get('produk', 'Tidak tersedia')
 else:
     st.error(f"Error fetching data from API: {response_id_kandidat.status_code}")
-    nama = jenis_kelamin = produk = 'Error mengambil data'
+    api_id_kandidat, api_nama = api_jenis_kelamin = api_produk = 'Error mengambil data'
 
-# Menampilkan data menggunakan container di Streamlit
-with st.container():
-    st.markdown('<h2 style="font-size: 24px; font-weight: bold;">Info Kandidat Sesuai ID</h2>', unsafe_allow_html=True)
-    st.markdown(f'ID Kandidat: {api_id_kandidat}')
-    st.markdown(f'Name: {api_nama}')
-    st.markdown(f'Jenis Kelamin: {api_jenis_kelamin}')
-    st.markdown(f'Produk: {api_produk}')
+tab1, tab2, tab3, tab4 = st.tabs(["📈 Input Informasi", "📄 Hasil Transkrip", "🖨️ Hasil Prediksi", "⚙️ <admin> Input"])
 
 ########################TAB 1
 with tab1:
@@ -146,12 +138,12 @@ with tab1:
     #nanti dikasih juga cara dan deskripsi tiap bagian
 
     #ini nanti pakai API PITO
-    with st.container(border=True):
+    with st.container():
         st.markdown('<h2 style="font-size: 24px; font-weight: bold;">Info Kandidat Sesuai ID</h2>', unsafe_allow_html=True)
-        st.markdown('ID Kandidat: 123124')
-        st.markdown('Name: Ahjussi Ahjussi')
-        st.markdown('Jenis Kelamin: Pria')
-        st.markdown('Produk: PITO Staff')
+        st.markdown(f'ID Kandidat: {api_id_kandidat}')
+        st.markdown(f'Name: {api_nama}')
+        st.markdown(f'Jenis Kelamin: {api_jenis_kelamin}')
+        st.markdown(f'Produk: {api_produk}')
 
     selected_product = df_pito_product[df_pito_product["PRODUCT"] == selected_option_product_set]
     with st.container(border=True):
@@ -655,6 +647,7 @@ with tab2:
         st.markdown(f'Name: {api_nama}')
         st.markdown(f'Jenis Kelamin: {api_jenis_kelamin}')
         st.markdown(f'Produk: {api_produk}')
+	    
     with st.container():
         def get_transkrip_data(registration_id):
             conn = create_db_connection()
