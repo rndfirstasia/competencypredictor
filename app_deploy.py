@@ -94,7 +94,7 @@ LEFT JOIN pito_competency_level AS lvl ON comp.id_competency = lvl.id_competency
 df_pito_product = connx.fetchall()
 column_names_pito_product = [i[0] for i in connx.description]
 df_pito_product = pd.DataFrame(df_pito_product, columns=column_names_pito_product)
-options_product_set = df_pito_product['PRODUCT'].drop_duplicates().tolist() #list produk dari database
+options_product_set = [""] + df_pito_product['PRODUCT'].drop_duplicates().tolist() #list produk dari database
 
 connx.execute("""
 SELECT
@@ -106,7 +106,7 @@ FROM pito_level AS lvl;
 df_pito_level = connx.fetchall()
 column_names_pito_level = [i[0] for i in connx.description]
 df_pito_level = pd.DataFrame(df_pito_level, columns=column_names_pito_level)
-options_level_set = df_pito_level['id_level_set'].drop_duplicates().tolist() #list level dari database
+options_level_set = [""] + df_pito_level['id_level_set'].drop_duplicates().tolist() #list level dari database
 connx.close()
 
 st.header("Aplikasi Prediksi Kompetensi")
