@@ -881,7 +881,7 @@ with tab2:
             """, unsafe_allow_html=True)
             st.markdown(table_html, unsafe_allow_html=True)
         else:
-            st.write("ID Kandidat Tidak Ditemukan")
+            st.warning("ID Kandidat tidak ditemukan/kosong")
 
 ########################TAB 3
 with tab3:
@@ -893,8 +893,8 @@ with tab3:
     #     st.markdown(f'Produk: {api_produk}')
     
     with st.container(border=True):
-        st.write("Pilihan tidak ada bisa dipilih jika dirasa memang tidak muncul di Assessor")
-        st.write("Dropdown kompetensi dan level kompetensi tidak akan mengubah pilihan level di bagian ini")
+        st.write("Pilihan 'kosong' ada bisa dipilih jika dirasa memang tidak muncul di Assessor")
+        st.write("Dropdown kompetensi dan level kompetensi **di sidebar** tidak akan mengubah pilihan level di bagian ini")
 
     with st.container():
         def get_level_set_from_audio_table(registration_id):
@@ -1057,6 +1057,8 @@ with tab3:
                     update_success = True
 
                 #st.success(f"Update berhasil untuk: {row.competency}") #ini masih salah
+	else:
+            st.warning("ID Kandidat tidak ditemukan/kosong")
 
 ########################TAB 4
 with tab4:
