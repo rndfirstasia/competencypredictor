@@ -6,6 +6,7 @@ import mysql.connector
 from mysql.connector import Error
 
 from openai import OpenAI
+import openai
 import requests
 import io
 from io import StringIO
@@ -19,7 +20,6 @@ st.set_page_config(
 )
 
 #env
-#taruh semua credential ke secrets
 
 #untuk deploy
 aws_access_key_id = st.secrets["aws"]["aws_access_key_id"]
@@ -353,28 +353,42 @@ with tab1:
         prompt = (
             f"Berikut adalah transkrip dari percakapan interview dari {num_speakers} orang: \n"
             f"{transkrip}\n\n"
-            "Bagian dari masing masing speaker ini masih belum benar dan terdapat overlap.\n "
+            "Dalam transkrip itu masih terdapat overlap antara Kandidat dan Assessor.\n"
+            "Maka masukkan bagian yang overlap ke pembicara yang sebenarnya. Sehingga akan ada tanya jawab antar Assessor dan kandidat dan PASTI tidak hanya menjadi satu row.\n "
             "Jika orang lebih dari 2 maka akan ada lebih dari satu assessor. Kandidat tetap hanya akan ada satu.\n"
             "1. Kandidat (yang menjawab pertanyaan)\n"
             "2. Assessor (yang mengajukan pertanyaan)\n"
+            "Contoh format dari bagian percakapan assessor dan kandidat:\n"
+            "**Kandidat:** Untuk, misalkan contoh produknya ini sudah kita ekspor. Terus sudah kita coba untuk ekspor ke beberapa tempat, bagaimana supaya manajemen distribusinya (MD) itu produk ini dijalankan. Sudah kita ekspor, kita sesuaikan dengan promo yang mereka dari MD berikan. Karena kalau promonya tidak disesuaikan, secara otomatis produk ini nanti tidak akan terjual.\n"
+            "**Assessor:** Kemudian, kalau dari sisi improvement, selama dua tahun terakhir ini boleh diceritakan seperti apa langkah improvement yang sudah pernah Bapak coba lakukan dan apakah inisiasinya dari diri Bapak sendiri? Ada contohnya seperti apa? Jika improvement terlalu banyak, seperti yang saya sampaikan tadi, karena kita lebih banyak, kalau saya sendiri.\n"
+            "**Kandidat:** Kita lebih banyak ke ATM. Misalkan ada tim di tempat lain melakukan sesuatu, kita coba lakukan itu dengan sedikit modifikasi. Contohnya, kita selalu mengadakan yang namanya Red Light Promo. Itu salah satu usaha yang kita lakukan. Memang itu bukan gagasan dari saya, tapi gagasan dari beberapa toko. Tapi konsistensinya itu saya jalankan di tempat sini, konsistensi sebagaimana kita di tengah kondisi saat ini, contoh, trafik yang turun dan lain-lain, untuk menarik pelanggan yang datang ke toko, baik yang dari mal maupun yang dari luar. Itu yang saya konsistensikan dilakukan di toko ini.\n"
+            "**Assessor:** Dengan melihat yang sudah dilakukan di toko-toko lain, jadi coba tetap konsisten dilakukan di tempat saat ini. Kalau misalkan dengan kondisi cabang saat ini, boleh diceritakan?.\n"
+            "dan seterusnya.\n"
             "Tolong pastikan urutan dialog tetap seperti dalam transkrip asli, meskipun ada beberapa assessor.\n"
             "Betulkan juga bagian yang ada salah ketik atau ejaan yang kurang benar kecuali nama orang, nama perusahaan, nama jalan, nama kota, nama provinsi, nama negara, nama produk, singkatan.\n"
         )
 
-        messages = [
-            {"role": "system", "content": "Kamu adalah pemisah transkrip interview antara assessor dan kandidat"},
-            {"role": "user", "content": prompt}
+        messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": prompt
+                },
+            ],
+        }
         ]
 
         try:
             # st.write("Sending request to API...") #debug
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=messages,
-                temperature=0,
-                top_p=0.5,
-                frequency_penalty=0,
-                presence_penalty=0
+            response = openai.chat.completions.create(
+                model="o1-mini",
+                messages=messages
+                # temperature=0,
+                # top_p=0.5,
+                # frequency_penalty=0,
+                # presence_penalty=0
             )
 
             # st.write("API Response:", response) #debug
@@ -391,6 +405,7 @@ with tab1:
         lines = gpt_response.split('\n')
         #st.write(lines) #debug
         data = {'text': [], 'speaker': []}
+        #st.write(f"Data pada process gpt response: {data}") #debug
 
         for line in lines:
             if line.startswith("**Assessor:** ") or line.startswith("Assessor: ") or line.startswith("ASSESSOR: ") or line.startswith("**ASSESSOR**: ") or line.startswith("**ASSESSOR:** "):
@@ -439,6 +454,7 @@ with tab1:
                 continue
 
             df = process_gpt_response_to_dataframe(corrected_transcript)
+            #st.write(df) #debug
             
             if df.empty:
                 st.error(f"Empty DataFrame for registration_id {registration_id}.")
@@ -544,7 +560,7 @@ with tab1:
             FROM txtan_audio a
             JOIN pito_product prd ON prd.id_product = a.id_product
             JOIN pito_competency comp ON comp.id_product = prd.id_product
-            JOIN pito_competency_level lvl ON lvl.id_competency = comp.id_competency
+            LEFT JOIN pito_competency_level lvl ON lvl.id_competency = comp.id_competency
             WHERE a.registration_id = %s
         """
         
@@ -552,6 +568,7 @@ with tab1:
         result = cursor.fetchall()
         cursor.close()
         conn.close()
+        #st.write(f"hasil query competency: {competencies}")#debug
         
         # Kembalikan hasil sebagai daftar dictionary agar mudah digunakan
         competencies = [{
@@ -589,10 +606,14 @@ with tab1:
     id_level_set_fix, nama_level = get_level_set_from_audio_table(id_input_id_kandidat)
     filtered_levels_predict_competency = df_pito_level[df_pito_level['id_level_set'] == id_level_set_fix]
     dropdown_options_predict_competency = filtered_levels_predict_competency['NAMA LEVEL'].tolist()
+    #st.write(dropdown_options_predict_competency)#debug
 
     def predict_competency(combined_text, competencies):
         prompt = "Saya memiliki transkrip hasil dari wawancara dan daftar kompetensi yang ingin diidentifikasi.\n\n"
         prompt += "Buatlah hasil analisa menjadi bentuk tabel dan prediksi juga levelnya.\n"
+        prompt += "Hasil yang dikeluarkan WAJIB table dan TANPA FORMAT TEXT bold, italic atau sejenisnya.\n"
+        prompt += "Level yang digunakan adalah Very High, High, Medium, Low, Very Low dan level WAJIB dalam bahasa inggris.\n"
+        #prompt += f"Level yang digunakan juga mengikuti dari {dropdown_options_predict_competency} dan level WAJIB dalam bahasa inggris.\n"
         prompt += f"Teks transkrip berikut: {combined_text}\n\n"
         prompt += "Berikut adalah daftar kompetensi dengan level dan deskripsinya:\n"
         
@@ -608,24 +629,32 @@ with tab1:
                             f"      Deskripsi Level: {level_description}\n")
             else:
                 prompt += f"  (Tidak ada level spesifik, gunakan deskripsi kompetensi umum: {competency['description']})\n"
-                prompt += f" Serta level mengikuti dari {dropdown_options_predict_competency}."
+                prompt += "Level yang digunakan adalah Very High, High, Medium, Low, Very Low dan level WAJIB dalam bahasa inggris.\n"
+                #prompt += f" Serta level mengikuti dari {dropdown_options_predict_competency}."
 
         prompt += "\nHasil hanya akan berupa tabel dengan kolom: Kompetensi, Level, dan Alasan Kemunculan\n"
         
         #st.write(f"Prompt: {prompt}") #debug
 
-        messages = [
-            {"role": "system", "content": "Kamu adalah analis yang dapat memprediksi kompetensi dan levelnya berdasarkan transkrip wawancara."},
-            {"role": "user", "content": prompt}
+        messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": prompt
+                },
+            ],
+        }
         ]
 
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages = messages,
-            temperature=0,
-            top_p=0.5,
-            frequency_penalty=0,
-            presence_penalty=0
+        response = openai.chat.completions.create(
+            model="o1-mini",
+            messages = messages
+            # temperature=0,
+            # top_p=0.5,
+            # frequency_penalty=0,
+            # presence_penalty=0
         )
 
         corrected_transcript_dict = response.model_dump()
@@ -698,16 +727,27 @@ with tab1:
 
             except Exception as e:
                 st.error(f"Error processing prediction for registration ID {registration_id}: {e}")
+        
+        #st.write(all_predictions) #debug
 
         if all_predictions:
-            #st.write("Final Predictions before:") #debug
-            final_predictions_df = pd.concat(all_predictions, ignore_index=True)
-            final_predictions_df = final_predictions_df.drop(index=0).reset_index(drop=True)
-            #st.write("Final Predictions after:") #debug
-            #st.write(final_predictions_df) #debug
-            insert_into_result(final_predictions_df, registration_id)
+            #st.write(f"all_predictions before: {all_predictions}")  # debug
+            
+            if isinstance(all_predictions, list) and all(isinstance(df, pd.DataFrame) for df in all_predictions):
+                final_predictions_df = pd.concat(all_predictions, ignore_index=True)
+                #st.dataframe(f"Final pred CONCAT: {final_predictions_df}") #debug
+                final_predictions_df = final_predictions_df.applymap(lambda x: x.replace('**', '') if isinstance(x, str) else x)
+                #st.dataframe(f"Final pred MAP: {final_predictions_df}") #debug
+                final_predictions_df = final_predictions_df.drop(index=0).reset_index(drop=True)
+                #st.dataframe(f"Final pred DROP dan RESET INDEX: {final_predictions_df}") #debug
+                
+                #st.write(f"Final pred DONE: {final_predictions_df}")  # debug
+                
+                insert_into_result(final_predictions_df, registration_id)
+            else:
+                st.error("Error: all_predictions harus berupa list yang berisi DataFrame.")
         else:
-            st.write("No predictions to display.")
+            st.error("Error: all_predictions kosong.")
 
     if st.button("Upload, Transcribe dan Prediksi", key="SimpanTranscribe"):
         if audio_file is not None:
@@ -774,6 +814,8 @@ with tab1:
                             start_section = segment['start_section']
                             end_section = segment['end_section']
 
+                            #st.write(f"Registration ID: {registration_id}, ID Audio: {id_audio}, Speaker: {speaker}") #debug
+
                             try:
                                 cursor = conn.cursor()
                                 insert_transcript_query = """
@@ -789,6 +831,7 @@ with tab1:
                                     text,
                                     speaker
                                 )
+
                                 cursor.execute(insert_transcript_query, data_transcript)
                                 conn.commit()
 
@@ -1366,8 +1409,3 @@ with tab4:
                 save_assessor_to_db(input_assessor_code, input_assessor_name)
             else:
                 st.error("Mohon masukkan kode dan nama assessor.")
-
-
-
-
-
