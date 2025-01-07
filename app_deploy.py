@@ -33,6 +33,7 @@ mysql_database = st.secrets["mysql"]["database"]
 client = OpenAI(api_key=st.secrets["openai"]["api"])
 hf_token = st.secrets["hf"]["token"]
 flask_url = st.secrets["flask"]["url"]
+openai.api_key = st.secrets["openai"]["api"]
  #untuk API PITO
 pito_url = st.secrets["sistem_fac"]["pito_url"]
 vast_url = st.secrets["sistem_fac"]["vast_url"]
