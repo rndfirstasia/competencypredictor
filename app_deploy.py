@@ -867,7 +867,7 @@ with tab1:
                 data = {'registration_id': id_input_id_kandidat}
 
                 try:
-                    response = requests.post(f"{flask_url}/transcribe", files=files, data=data, stream=True, timeout=600)
+                    response = requests.post(f"{flask_url}/transcribe", files=files, data=data, stream=True, timeout=1200)
                     response.raise_for_status()  # Raise error jika status_code bukan 200
                 except requests.Timeout:
                     st.error("Timeout: Proses transkripsi terlalu lama. Coba lagi.")
